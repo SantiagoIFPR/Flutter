@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:produtos_crud/app/view/produto_details.dart';
 import 'package:produtos_crud/app/view/produto_form.dart';
 
 import 'view/produto_list.dart';
@@ -6,12 +7,14 @@ import 'view/produto_list.dart';
 class MyApp extends StatelessWidget {
   static const HOME='/';
   static const PRODUTO_FORM='produto-form';
+  static const PRODUTO_DETAILS='produto-details';
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -27,6 +30,7 @@ class MyApp extends StatelessWidget {
       routes: {
         HOME:(context)=>ProdutoList(),
         PRODUTO_FORM:(context)=>ProdutoForm(),
+        PRODUTO_DETAILS:(context)=>ProdutoDetails()
       },
     );
   }

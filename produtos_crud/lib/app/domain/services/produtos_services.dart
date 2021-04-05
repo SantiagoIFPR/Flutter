@@ -8,6 +8,8 @@ class ProdutoService {
 
     save(Produto produto){
       validarNome(produto.nome);
+      validarQuantidade(produto.quantidade);
+      validarValorUnitario(produto.valorunitario);
       _dao.save(produto);
     }
 
@@ -29,6 +31,23 @@ class ProdutoService {
         throw new DomainLayerException('O nome deve possuir pelo menos $min caracteres.');
       }else if(nome.length > max){
         throw new DomainLayerException('O nome deve possuir no máximo $max caracteres.');
+      }
+    }
+
+    validarQuantidade(String quantidade){
+      var max = 4;
+
+      if(quantidade == null){
+        throw new DomainLayerException('A quantidade é obrigatório.');
+      }else if(quantidade.length > max){
+        throw new DomainLayerException('A quantidade deve possuir no máximo $max caracteres.');
+      }
+    }
+
+    validarValorUnitario(String valorunitario){
+
+      if(valorunitario == null){
+        throw new DomainLayerException('O valor unitário é obrigatório.');
       }
     }
 }

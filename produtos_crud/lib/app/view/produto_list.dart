@@ -1,71 +1,98 @@
 import 'package:flutter/material.dart';
-import 'package:produtos_crud/app/database/sqlite/dao/produto_dao_impl.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:produtos_crud/app/domain/entities/produtos.dart';
-import 'package:produtos_crud/app/my_app.dart';
+import 'package:produtos_crud/app/view/produto_list_back.dart';
 
 class ProdutoList extends StatelessWidget {
-/*  final lista=[
-    {'nome':'Santiago','telefone':'(44)99766-0895','avatar':'https://cdn.pixabay.com/photo/2013/07/13/10/07/man-156584_960_720.png'},
-    {'nome':'Karen','telefone':'(44)99826-4674','avatar':'https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027367_960_720.png'},
-    {'nome':'Manuela','telefone':'(44)98828-6889','avatar':'https://cdn.pixabay.com/photo/2021/03/12/08/01/child-6089047_960_720.png'},
+  final _back = ProdutoListBack();
 
-  ];*/
+  CircleAvatar circleAvatar(String url) {
+    return (Uri.tryParse(url).isAbsolute)
+        ? CircleAvatar(backgroundImage: NetworkImage(url))
+        : CircleAvatar(child: Icon(Icons.person));
+  }
 
-  Future<List<Produto>> _buscar() async {
-    return ProdutosDAOImpl().find();
+  Widget iconEditButton(Function onPressed) {
+    return IconButton(
+        icon: Icon(Icons.edit), color: Colors.orange, onPressed: onPressed);
+  }
+
+  Widget iconRemoveButton(BuildContext context, Function remove) {
+    return IconButton(
+        icon: Icon(Icons.delete),
+        color: Colors.red,
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                      title: Text('Excluir'),
+                      content: Text('Confirma a exclusão?'),
+                      actions: [
+                        FlatButton(
+                          child: Text('Não'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        FlatButton(
+                          child: Text('Sim'),
+                          onPressed: remove,
+                        ),
+                      ]));
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _buscar(),
-        builder: (context, futuro) {
-          if (futuro.hasData) {
-            List<Produto> lista = futuro.data;
-            return Scaffold(
-              appBar: AppBar(
-                title: Text("Lista de Produtos"),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(MyApp.PRODUTO_FORM);
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Lista de Produtos"),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  _back.goToForm(context);
+                })
+          ],
+        ),
+        body: Observer(builder: (context) {
+          return FutureBuilder(
+              future: _back.list,
+              builder: (context, futuro) {
+                if (!futuro.hasData) {
+                  return CircularProgressIndicator();
+                } else {
+                  List<Produto> lista = futuro.data;
+                  return ListView.builder(
+                    itemCount: lista.length,
+                    itemBuilder: (context, i) {
+                      var produto = lista[i];
+                      return ListTile(
+                        leading: circleAvatar(produto.urlAvatar),
+                        title: Text(produto.nome),
+                        onTap: (){
+                          _back.goToDetails(context, produto);
+                        },
+                        subtitle: Text(produto.valorunitario),
+                        trailing: Container(
+                          width: 100,
+                          child: Row(
+                            children: [
+                              iconEditButton(() {
+                                _back.goToForm(context, produto);
+                              }),
+                              iconRemoveButton(context, () {
+                                _back.remove(produto.id);
+                                Navigator.of(context).pop();
+                              })
+                            ],
+                          ),
+                        ),
+                      );
                     },
-                  )
-                ],
-              ),
-              body: ListView.builder(
-                itemCount: lista.length,
-                itemBuilder: (context, i) {
-                  var produto = lista[i];
-                  var avatar = CircleAvatar(
-                      backgroundImage: NetworkImage(produto.urlAvatar));
-                  return ListTile(
-                    leading: avatar,
-                    title: Text(produto.nome),
-                    subtitle: Text(produto.valorunitario),
-                    trailing: Container(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: null,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: null,
-                          ),
-                        ],
-                      ),
-                    ),
                   );
-                },
-              ),
-            );
-          } else {
-            return Scaffold();
-          }
-        });
+                }
+              });
+        }));
   }
 }

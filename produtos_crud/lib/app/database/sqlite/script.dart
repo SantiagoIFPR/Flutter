@@ -1,7 +1,7 @@
 
 final createTable='''
   CREATE TABLE produto(
-    id INT PRIMARY KEY 
+    id INTEGER NOT NULL PRIMARY KEY 
     ,nome VARCHAR(200) NOT NULL
     ,quantidade CHAR(8) NOT NULL
     ,valorunitario CHAR(10) NOT NULL
