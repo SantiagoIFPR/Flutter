@@ -49,7 +49,8 @@ class ProdutosDAOImpl implements ProdutosDAO {
         produto.nome,
         produto.quantidade,
         produto.valorunitario,
-        produto.urlAvatar
+        produto.urlAvatar,
+        produto.id
       ]);
     }
   }
